@@ -2,6 +2,9 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <stdint.h>
+
+int copyFile(char filePath[], char destinationPath[]);
 
 int main(int argc, char *argv[]){
     if (argc < 3){
@@ -39,4 +42,37 @@ int main(int argc, char *argv[]){
         }
     }
     return 0;
+}
+
+int copyFile(char filePath[], char destinationPath[]){
+    FILE *referenceFile = fopen(filePath, "rb");
+    if (referenceFile == NULL){
+        printf("Error! Failed to open referenceFile");
+        return -1;
+    }
+
+    FILE *outputFile = fopen(destinationPath, "wb");
+    if (outputFile == NULL){
+        printf("Error! Failed to open outputFile");
+        return -1;
+    }
+
+    int buffer_size = 1;
+    uint8_t buffer[buffer_size];
+
+    while (fread(&buffer, buffer_size, 1, referenceFile) != 0){
+        if(fwrite(&buffer, buffer_size, 1, outputFile) == 0){
+            printf("Error! Failed to complete file copying");
+            return -1;
+        }
+    }
+
+    if (fclose(referenceFile) != 0){
+        printf("Error! Failed to close the referenceFile");
+        return -1;
+    }
+    if (fclose(outputFile) != 0){
+        printf("Error! Failed to close the outputFile");
+        return -1;
+    }
 }
