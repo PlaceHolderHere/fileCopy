@@ -9,7 +9,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]);  //
 
 int main(int argc, char *argv[]){
     if (argc < 3){
-        printf("Error! Incomplete inputs, please provide a reference directory and an output directory.");
+        printf("Error! Incomplete inputs, please provide a reference directory and an output directory.\n");
         return -1;
     }
  
@@ -35,7 +35,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
 
     DIR *referenceDirectory = opendir(referenceDirectoryPath);
     if (referenceDirectory == NULL){
-        printf("Error! Failed to open referenceDirectory.");
+        printf("Error! Failed to open referenceDirectory.\n");
         return -1;
     }
 
@@ -72,13 +72,13 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
 int copyFile(char filePath[], char destinationPath[]){
     FILE *referenceFile = fopen(filePath, "rb");
     if (referenceFile == NULL){
-        printf("Error! Failed to open referenceFile");
+        printf("Error! Failed to open referenceFile\n");
         return -1;
     }
 
     FILE *outputFile = fopen(destinationPath, "wb");
     if (outputFile == NULL){
-        printf("Error! Failed to open outputFile");
+        printf("Error! Failed to open outputFile\n");
         return -1;
     }
 
@@ -87,17 +87,17 @@ int copyFile(char filePath[], char destinationPath[]){
 
     while (fread(&buffer, buffer_size, 1, referenceFile) != 0){
         if(fwrite(&buffer, buffer_size, 1, outputFile) == 0){
-            printf("Error! Failed to complete file copying");
+            printf("Error! Failed to complete file copying\n");
             return -1;
         }
     }
 
     if (fclose(referenceFile) != 0){
-        printf("Error! Failed to close the referenceFile");
+        printf("Error! Failed to close the referenceFile\n");
         return -1;
     }
     if (fclose(outputFile) != 0){
-        printf("Error! Failed to close the outputFile");
+        printf("Error! Failed to close the outputFile\n");
         return -1;
     }
 
