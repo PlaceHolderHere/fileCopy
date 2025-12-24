@@ -5,41 +5,66 @@
 #include <stdint.h>
 
 int copyFile(char filePath[], char destinationPath[]);
+int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]);  // Work in Progress
 
 int main(int argc, char *argv[]){
     if (argc < 3){
         printf("Error! Incomplete inputs, please provide a reference directory and an output directory.");
         return -1;
     }
-
-    // Variable Intialization
-    struct dirent *entry;
-    struct stat info;
-    char currentFilePath[1024];
-    
+ 
     // Reference Directory
     char *referenceDirectoryPath;
     referenceDirectoryPath = argv[1];
+    char *outputDirectoryPath;
+    outputDirectoryPath = argv[2];
+
+    copyDir(referenceDirectoryPath, outputDirectoryPath);
+
+    return 0;
+}
+
+// Working in Progress
+int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
+    // Variable Initialization
+    struct dirent *refDirEntry;
+    struct dirent *outputDirectoryEntry;
+    struct stat currentFileInfo;
+    char currentFilePath[1024];
+    char outputFilePath[1024];
+
     DIR *referenceDirectory = opendir(referenceDirectoryPath);
     if (referenceDirectory == NULL){
-        printf("Error! Failed to open Reference Directory.");
+        printf("Error! Failed to open referenceDirectory.");
         return -1;
     }
 
     // Reading the Reference Directory
-    while ((entry = readdir(referenceDirectory)) != NULL){
-        if (strcmp(entry->d_name, "..") != 0 && strcmp(entry->d_name, ".")){ // Filtering Out Parent & Current Working Directory
-            snprintf(currentFilePath, sizeof(currentFilePath), "%s\\%s", referenceDirectoryPath, entry->d_name); // Getting the current file's direct file path
+    while ((refDirEntry = readdir(referenceDirectory)) != NULL){
+        if (strcmp(refDirEntry->d_name, "..") != 0 && strcmp(refDirEntry->d_name, ".")){ // Filtering Out Parent & Current Working Directory
+            snprintf(currentFilePath, sizeof(currentFilePath), "%s\\%s", referenceDirectoryPath, refDirEntry->d_name); // Getting the currentFilePath
             // Separating Directories and Files
-            if (stat(currentFilePath, &info) == 0){
-                if (S_ISDIR(info.st_mode)){
-                    printf("Directory: %s\n", entry->d_name);
+            if (stat(currentFilePath, &currentFileInfo) == 0){
+                if (S_ISDIR(currentFileInfo.st_mode)){
+                    printf("Directory: %s\n", refDirEntry->d_name);
+                    // WIP
                 }
-                else if(S_ISREG(info.st_mode)){ 
-                    printf("File: %s\n", entry->d_name);
+                // File Copying
+                else if(S_ISREG(currentFileInfo.st_mode)){ 
+                    printf("Copying %s...\n", refDirEntry->d_name);
+                    snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name); // Getting the outputFilePath
+                    if (copyFile(currentFilePath, outputFilePath) != 0){
+                        printf("Error! Failed to copy %s\n", refDirEntry->d_name);
+                        return -1;
+                    }   
                 }   
             }
         }
+    }
+
+    if (closedir(referenceDirectory) != 0){
+        printf("Error! Failed to close referenceDirectory\n");
+        return -1;
     }
     return 0;
 }
