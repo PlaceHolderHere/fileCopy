@@ -75,4 +75,6 @@ int copyFile(char filePath[], char destinationPath[]){
         printf("Error! Failed to close the outputFile");
         return -1;
     }
+
+    return 0;
 }
