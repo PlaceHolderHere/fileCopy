@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <stdint.h>
+#include <errno.h>
 
 int copyFile(char filePath[], char destinationPath[]);
 int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]);  // Work in Progress
@@ -30,6 +31,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     struct dirent *refDirEntry;
     struct dirent *outputDirectoryEntry;
     struct stat currentFileInfo;
+    struct stat outputFileInfo;
     char currentFilePath[1024];
     char outputFilePath[1024];
 
@@ -52,6 +54,22 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
                 // File Copying
                 else if(S_ISREG(currentFileInfo.st_mode)){ 
                     printf("Copying %s...\n", refDirEntry->d_name);
+
+                    // Checking if destinationDir is present
+                    if (stat(destinationDirectoryPath, &outputFileInfo) != 0){
+                        if (errno == ENOENT){
+                            printf("Creating a folder at %s\n", destinationDirectoryPath);
+                            if (mkdir(destinationDirectoryPath) != 0){
+                                printf("Error! Failed to copy directory.");
+                                return -1;
+                            }
+                        }
+                        else{
+                            printf("Error! Could not Access the output directory.\n");
+                            return -1;
+                        }
+                    }
+
                     snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name); // Getting the outputFilePath
                     if (copyFile(currentFilePath, outputFilePath) != 0){
                         printf("Error! Failed to copy %s\n", refDirEntry->d_name);
