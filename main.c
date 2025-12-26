@@ -29,7 +29,6 @@ int main(int argc, char *argv[]){
 int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     // Variable Initialization
     struct dirent *refDirEntry;
-    struct dirent *outputDirectoryEntry;
     struct stat currentFileInfo;
     struct stat outputFileInfo;
     char currentFilePath[1024];
