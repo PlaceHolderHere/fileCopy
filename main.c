@@ -44,12 +44,13 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     // Reading the Reference Directory
     while ((refDirEntry = readdir(referenceDirectory)) != NULL){
         if (strcmp(refDirEntry->d_name, "..") != 0 && strcmp(refDirEntry->d_name, ".")){ // Filtering Out Parent & Current Working Directory
-            snprintf(currentFilePath, sizeof(currentFilePath), "%s\\%s", referenceDirectoryPath, refDirEntry->d_name); // Getting the currentFilePath
+            snprintf(currentFilePath, sizeof(currentFilePath), "%s\\%s", referenceDirectoryPath, refDirEntry->d_name); // currentFilePath
+            snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name); // outputFilePath
+
             // Separating Directories and Files
             if (stat(currentFilePath, &currentFileInfo) == 0){
                 if (S_ISDIR(currentFileInfo.st_mode)){
-                    printf("Directory: %s\n", refDirEntry->d_name);
-                    // WIP
+                    copyDir(currentFilePath, outputFilePath);
                 }
                 // File Copying
                 else if(S_ISREG(currentFileInfo.st_mode)){ 
@@ -60,7 +61,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
                         if (errno == ENOENT){
                             printf("Creating a folder at %s\n", destinationDirectoryPath);
                             if (mkdir(destinationDirectoryPath) != 0){
-                                printf("Error! Failed to copy directory.");
+                                printf("Error! Failed to copy directory.\n");
                                 return -1;
                             }
                         }
@@ -70,7 +71,6 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
                         }
                     }
 
-                    snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name); // Getting the outputFilePath
                     if (copyFile(currentFilePath, outputFilePath) != 0){
                         printf("Error! Failed to copy %s\n", refDirEntry->d_name);
                         return -1;
