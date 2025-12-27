@@ -64,7 +64,9 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
             // Separating Directories and Files
             if (stat(currentFilePath, &currentFileInfo) == 0){
                 if (S_ISDIR(currentFileInfo.st_mode)){
-                    copyDir(currentFilePath, outputFilePath);
+                    if (copyDir(currentFilePath, outputFilePath) != 0){
+                        return -1;
+                    }
                 }
                 // File Copying
                 else if(S_ISREG(currentFileInfo.st_mode)){ 
