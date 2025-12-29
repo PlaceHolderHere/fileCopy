@@ -19,8 +19,15 @@ int main(int argc, char *argv[]){
     referenceDirectoryPath = argv[1];
     char *outputDirectoryPath;
     outputDirectoryPath = argv[2];
+    char *outputName = "output";
+    if (argc > 3){
+        outputName = argv[3];
+    }
+    char outputPath[1024];
 
-    copyDir(referenceDirectoryPath, outputDirectoryPath);
+    // Updating the output file path
+    snprintf(outputPath, sizeof(outputPath), "%s\\%s", outputDirectoryPath, outputName);
+    copyDir(referenceDirectoryPath, outputPath);
 
     return 0;
 }
