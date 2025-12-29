@@ -27,7 +27,10 @@ int main(int argc, char *argv[]){
 
     // Updating the output file path
     snprintf(outputPath, sizeof(outputPath), "%s\\%s", outputDirectoryPath, outputName);
-    copyDir(referenceDirectoryPath, outputPath);
+    if (copyDir(referenceDirectoryPath, outputPath) != 0){
+        printf("Error! Could not copy directory.\n");
+        return -1;
+    }
 
     return 0;
 }
