@@ -38,6 +38,7 @@ int main(int argc, char *argv[]){
 
 int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     // Variable Initialization
+    int returnValue = 0;
     struct dirent *refDirEntry;
     struct stat currentFileInfo;
     struct stat outputFileInfo;
@@ -47,7 +48,8 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     DIR *referenceDirectory = opendir(referenceDirectoryPath);
     if (referenceDirectory == NULL){
         printf("Error! Failed to open referenceDirectory.\n");
-        return -1;
+        returnValue = -1;
+        goto closeRefDir;
     }
 
     // Checking if output directory exists
@@ -56,12 +58,14 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
             printf("Creating a folder at %s\n", destinationDirectoryPath);
             if (mkdir(destinationDirectoryPath) != 0){
                 printf("Error! Failed to copy directory.\n");
-                return -1;
+                returnValue = -1;
+                goto closeRefDir;
             }
         }
         else{
             printf("Error! Could not Access the output directory.\n");
-            return -1;
+            returnValue = -1;
+            goto closeRefDir;
         }
     }
 
@@ -75,7 +79,8 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
             if (stat(currentFilePath, &currentFileInfo) == 0){
                 if (S_ISDIR(currentFileInfo.st_mode)){
                     if (copyDir(currentFilePath, outputFilePath) != 0){
-                        return -1;
+                        returnValue = -1;
+                        goto closeRefDir;
                     }
                 }
                 // File Copying
@@ -83,17 +88,17 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
                     printf("Copying %s...\n", refDirEntry->d_name);
                     if (copyFile(currentFilePath, outputFilePath) != 0){
                         printf("Error! Failed to copy %s\n", refDirEntry->d_name);
-                        return -1;
+                        returnValue = -1;
+                        goto closeRefDir;
                     }   
                 }   
             }
         }
     }
-    if (closedir(referenceDirectory) != 0){
-        printf("Error! Failed to close referenceDirectory\n");
-        return -1;
-    }
-    return 0;
+
+    closeRefDir:
+    closedir(referenceDirectory);
+    return returnValue;
 }
 
 
