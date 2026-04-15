@@ -95,37 +95,44 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     }
     return 0;
 }
+
+
 int copyFile(char filePath[], char destinationPath[]){
+    int returnValue = 0;
     FILE *referenceFile = fopen(filePath, "rb");
-    if (referenceFile == NULL){
-        printf("Error! Failed to open referenceFile\n");
-        return -1;
-    }
-
     FILE *outputFile = fopen(destinationPath, "wb");
-    if (outputFile == NULL){
-        printf("Error! Failed to open outputFile\n");
-        return -1;
-    }
-
     int buffer_size = 1;
     uint8_t buffer[buffer_size];
 
+    // referenceFile Error Handling
+    if (referenceFile == NULL){
+        printf("Error! Failed to open referenceFile\n");
+        returnValue = -1;
+        goto closeRefFile;
+    }
+
+    // outputFile Error Handling
+    if (outputFile == NULL){
+        printf("Error! Failed to open outputFile\n");
+        returnValue = -1;
+        goto closeAllFiles;
+    }
+    
+    // Copying Files
     while (fread(&buffer, buffer_size, 1, referenceFile) != 0){
         if(fwrite(&buffer, buffer_size, 1, outputFile) == 0){
             printf("Error! Failed to complete file copying\n");
-            return -1;
+            returnValue = -1;
+            goto closeAllFiles;
         }
     }
 
-    if (fclose(referenceFile) != 0){
-        printf("Error! Failed to close the referenceFile\n");
-        return -1;
-    }
-    if (fclose(outputFile) != 0){
-        printf("Error! Failed to close the outputFile\n");
-        return -1;
-    }
+    // Exit Handling
+    closeAllFiles:
+    fclose(outputFile);
 
-    return 0;
+    closeRefFile:
+    fclose(referenceFile);
+
+    return returnValue;
 }
