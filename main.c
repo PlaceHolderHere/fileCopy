@@ -35,7 +35,7 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-// Working in Progress
+
 int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     // Variable Initialization
     struct dirent *refDirEntry;
