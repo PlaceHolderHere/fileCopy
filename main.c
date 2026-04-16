@@ -106,9 +106,11 @@ int copyFile(char filePath[], char destinationPath[]){
     int returnValue = 0;
     FILE *referenceFile = fopen(filePath, "rb");
     FILE *outputFile = fopen(destinationPath, "wb");
-    int buffer_size = 1;
+    int buffer_size = 65536;
     uint8_t buffer[buffer_size];
-
+    const int uint8_size = sizeof(uint8_t);
+    int num_of_bytes_read = 0;
+    
     // referenceFile Error Handling
     if (referenceFile == NULL){
         printf("Error! Failed to open referenceFile\n");
@@ -124,8 +126,8 @@ int copyFile(char filePath[], char destinationPath[]){
     }
     
     // Copying Files
-    while (fread(&buffer, buffer_size, 1, referenceFile) != 0){
-        if(fwrite(&buffer, buffer_size, 1, outputFile) == 0){
+    while ((num_of_bytes_read = fread(&buffer, uint8_size, buffer_size, referenceFile)) > 0){
+        if(fwrite(&buffer, uint8_size, num_of_bytes_read, outputFile) != num_of_bytes_read){
             printf("Error! Failed to complete file copying\n");
             returnValue = -1;
             goto closeAllFiles;
