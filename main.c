@@ -6,7 +6,7 @@
 #include <errno.h>
 
 int copyFile(char filePath[], char destinationPath[]);
-int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]);  // Work in Progress
+int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]);
 
 int main(int argc, char *argv[]){
     if (argc < 3){
