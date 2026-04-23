@@ -55,8 +55,8 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     // Variable Initialization
     int returnValue = 0;
     struct dirent *refDirEntry;
-    struct stat currentFileInfo;
-    struct stat outputFileInfo;
+    struct stat64 currentFileInfo;
+    struct stat64 outputFileInfo;
     char currentFilePath[1024];
     char outputFilePath[1024];
 
@@ -68,7 +68,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     }
 
     // Checking if output directory exists
-    if (stat(destinationDirectoryPath, &outputFileInfo) != 0){
+    if (stat64(destinationDirectoryPath, &outputFileInfo) != 0){
         if (errno == ENOENT){
             printf("Creating a folder at %s\n", destinationDirectoryPath);
             if (mkdir(destinationDirectoryPath) != 0){
@@ -91,7 +91,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
             snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name); // outputFilePath
             
             // Separating Directories and Files
-            if (stat(currentFilePath, &currentFileInfo) == 0){
+            if (stat64(currentFilePath, &currentFileInfo) == 0){
                 if (S_ISDIR(currentFileInfo.st_mode)){
                     if (copyDir(currentFilePath, outputFilePath) != 0){
                         returnValue = -1;
@@ -121,8 +121,8 @@ int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[
     // Variable Initialization
     int returnValue = 0;
     struct dirent *refDirEntry;
-    struct stat currentFileInfo;
-    struct stat outputFileInfo;
+    struct stat64 currentFileInfo;
+    struct stat64 outputFileInfo;
     char currentFilePath[1024];
     char outputFilePath[1024];
 
@@ -134,7 +134,7 @@ int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[
     }
 
     // Checking if output directory exists
-    if (stat(destinationDirectoryPath, &outputFileInfo) != 0){
+    if (stat64(destinationDirectoryPath, &outputFileInfo) != 0){
         if (errno == ENOENT){
             if (mkdir(destinationDirectoryPath) != 0){
                 printf("Error! Failed to copy directory.\n");
@@ -156,7 +156,7 @@ int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[
             snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name); // outputFilePath
             
             // Separating Directories and Files
-            if (stat(currentFilePath, &currentFileInfo) == 0){
+            if (stat64(currentFilePath, &currentFileInfo) == 0){
                 if (S_ISDIR(currentFileInfo.st_mode)){
                     if (copyDir(currentFilePath, outputFilePath) != 0){
                         returnValue = -1;
@@ -185,7 +185,8 @@ int copyFile(char filePath[], char destinationPath[]){
     int returnValue = 0;
     FILE *referenceFile = fopen(filePath, "rb");
     FILE *outputFile = fopen(destinationPath, "wb");
-    int buffer_size = 65536;
+    // int buffer_size = 65536;
+    int buffer_size = 1000000;
     uint8_t buffer[buffer_size];
     const int uint8_size = sizeof(uint8_t);
     int num_of_bytes_read = 0;
