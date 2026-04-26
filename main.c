@@ -207,7 +207,7 @@ int copyFile(char filePath[], char destinationPath[]){
     int returnValue = 0;
     FILE *referenceFile = fopen(filePath, "rb");
     FILE *outputFile = fopen(destinationPath, "wb");
-    int buffer_size = 65536;
+    int buffer_size = 1000000;
     uint8_t buffer[buffer_size];
     const int uint8_size = sizeof(uint8_t);
     int num_of_bytes_read = 0;
