@@ -87,8 +87,19 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     // Reading the Reference Directory
     while ((refDirEntry = readdir(referenceDirectory)) != NULL){
         if (strcmp(refDirEntry->d_name, "..") != 0 && strcmp(refDirEntry->d_name, ".")){ // Filtering Out Parent & Current Working Directory
-            snprintf(currentFilePath, sizeof(currentFilePath), "%s\\%s", referenceDirectoryPath, refDirEntry->d_name); // currentFilePath
-            snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name); // outputFilePath
+            // getting the currentFilePath
+            if (snprintf(currentFilePath, sizeof(currentFilePath), "%s\\%s", referenceDirectoryPath, refDirEntry->d_name) < 0){
+                printf("Error! Failed to get currentFilePath\n");
+                returnValue = -1;
+                goto closeRefDir;
+            }; 
+
+            // getting the outputFilePath
+            if (snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name) < 0){
+                printf("Error! Failed to get outputFilePath\n");
+                returnValue = -1;
+                goto closeRefDir;
+            }
             
             // Separating Directories and Files
             if (stat64(currentFilePath, &currentFileInfo) == 0){
@@ -152,8 +163,19 @@ int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[
     // Reading the Reference Directory
     while ((refDirEntry = readdir(referenceDirectory)) != NULL){
         if (strcmp(refDirEntry->d_name, "..") != 0 && strcmp(refDirEntry->d_name, ".")){ // Filtering Out Parent & Current Working Directory
-            snprintf(currentFilePath, sizeof(currentFilePath), "%s\\%s", referenceDirectoryPath, refDirEntry->d_name); // currentFilePath
-            snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name); // outputFilePath
+            // getting the currentFilePath
+            if (snprintf(currentFilePath, sizeof(currentFilePath), "%s\\%s", referenceDirectoryPath, refDirEntry->d_name) < 0){
+                printf("Error! Failed to get currentFilePath\n");
+                returnValue = -1;
+                goto closeRefDir;
+            }; 
+
+            // getting the outputFilePath
+            if (snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name) < 0){
+                printf("Error! Failed to get outputFilePath\n");
+                returnValue = -1;
+                goto closeRefDir;
+            }
             
             // Separating Directories and Files
             if (stat64(currentFilePath, &currentFileInfo) == 0){
