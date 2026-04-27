@@ -180,7 +180,7 @@ int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[
             // Separating Directories and Files
             if (stat64(currentFilePath, &currentFileInfo) == 0){
                 if (S_ISDIR(currentFileInfo.st_mode)){
-                    if (copyDir(currentFilePath, outputFilePath) != 0){
+                    if (copyDirLogless(currentFilePath, outputFilePath) != 0){
                         returnValue = -1;
                         goto closeRefDir;
                     }
