@@ -62,7 +62,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
 
     DIR *referenceDirectory = opendir(referenceDirectoryPath);
     if (referenceDirectory == NULL){
-        printf("Error! Failed to open referenceDirectory.\n");
+        printf("Error Number: %d\n Error Message:%s\n\nError! Failed to open referenceDirectory.\n", errno, strerror(errno));
         returnValue = -1;
         goto closeRefDir;
     }
@@ -72,13 +72,13 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
         if (errno == ENOENT){
             printf("Creating a folder at %s\n", destinationDirectoryPath);
             if (mkdir(destinationDirectoryPath) != 0){
-                printf("Error! Failed to copy directory.\n");
+                printf("Error Number: %d\n Error Message:%s\n\nError! Failed to copy directory.\n", errno, strerror(errno));
                 returnValue = -1;
                 goto closeRefDir;
             }
         }
         else{
-            printf("Error! Could not Access the output directory.\n");
+            printf("Error Number: %d\n Error Message:%s\n\nError! Could not Access the output directory.\n", errno, strerror(errno));
             returnValue = -1;
             goto closeRefDir;
         }
@@ -89,14 +89,14 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
         if (strcmp(refDirEntry->d_name, "..") != 0 && strcmp(refDirEntry->d_name, ".")){ // Filtering Out Parent & Current Working Directory
             // getting the currentFilePath
             if (snprintf(currentFilePath, sizeof(currentFilePath), "%s\\%s", referenceDirectoryPath, refDirEntry->d_name) < 0){
-                printf("Error! Failed to get currentFilePath\n");
+                printf("Error Number: %d\n Error Message:%s\n\nError! Failed to get currentFilePath\n", errno, strerror(errno));
                 returnValue = -1;
                 goto closeRefDir;
             }; 
 
             // getting the outputFilePath
             if (snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name) < 0){
-                printf("Error! Failed to get outputFilePath\n");
+                printf("Error Number: %d\n Error Message:%s\n\nError! Failed to get outputFilePath\n", errno, strerror(errno));
                 returnValue = -1;
                 goto closeRefDir;
             }
@@ -139,7 +139,7 @@ int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[
 
     DIR *referenceDirectory = opendir(referenceDirectoryPath);
     if (referenceDirectory == NULL){
-        printf("Error! Failed to open referenceDirectory.\n");
+        printf("Error Number: %d\n Error Message:%s\n\nError! Failed to open referenceDirectory.\n", errno, strerror(errno));
         returnValue = -1;
         goto closeRefDir;
     }
@@ -148,13 +148,13 @@ int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[
     if (stat64(destinationDirectoryPath, &outputFileInfo) != 0){
         if (errno == ENOENT){
             if (mkdir(destinationDirectoryPath) != 0){
-                printf("Error! Failed to copy directory.\n");
+                printf("Error Number: %d\n Error Message:%s\n\nError! Failed to copy directory.\n", errno, strerror(errno));
                 returnValue = -1;
                 goto closeRefDir;
             }
         }
         else{
-            printf("Error! Could not Access the output directory.\n");
+            printf("Error Number: %d\n Error Message:%s\n\nError! Could not Access the output directory.\n", errno, strerror(errno));
             returnValue = -1;
             goto closeRefDir;
         }
@@ -165,14 +165,14 @@ int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[
         if (strcmp(refDirEntry->d_name, "..") != 0 && strcmp(refDirEntry->d_name, ".")){ // Filtering Out Parent & Current Working Directory
             // getting the currentFilePath
             if (snprintf(currentFilePath, sizeof(currentFilePath), "%s\\%s", referenceDirectoryPath, refDirEntry->d_name) < 0){
-                printf("Error! Failed to get currentFilePath\n");
+                printf("Error Number: %d\n Error Message:%s\n\nError! Failed to get currentFilePath\n", errno, strerror(errno));
                 returnValue = -1;
                 goto closeRefDir;
             }; 
 
             // getting the outputFilePath
             if (snprintf(outputFilePath, sizeof(outputFilePath), "%s\\%s", destinationDirectoryPath, refDirEntry->d_name) < 0){
-                printf("Error! Failed to get outputFilePath\n");
+                printf("Error Number: %d\n Error Message:%s\n\nError! Failed to get outputFilePath\n", errno, strerror(errno));
                 returnValue = -1;
                 goto closeRefDir;
             }
@@ -214,14 +214,14 @@ int copyFile(char filePath[], char destinationPath[]){
     
     // referenceFile Error Handling
     if (referenceFile == NULL){
-        printf("Error! Failed to open referenceFile\n");
+        printf("Error Number: %d\n Error Message:%s\n\nError! Failed to open referenceFile\n", errno, strerror(errno));
         returnValue = -1;
         goto closeRefFile;
     }
 
     // outputFile Error Handling
     if (outputFile == NULL){
-        printf("Error! Failed to open outputFile\n");
+        printf("Error Number: %d\n Error Message:%s\n\nError! Failed to open outputFile\n", errno, strerror(errno));
         returnValue = -1;
         goto closeAllFiles;
     }
@@ -229,7 +229,7 @@ int copyFile(char filePath[], char destinationPath[]){
     // Copying Files
     while ((num_of_bytes_read = fread(&buffer, uint8_size, buffer_size, referenceFile)) > 0){
         if(fwrite(&buffer, uint8_size, num_of_bytes_read, outputFile) != num_of_bytes_read){
-            printf("Error! Failed to complete file copying\n");
+            printf("Error Number: %d\n Error Message:%s\n\nError! Failed to complete file copying\n", errno, strerror(errno));
             returnValue = -1;
             goto closeAllFiles;
         }
