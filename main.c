@@ -34,6 +34,7 @@ int main(int argc, char *argv[]){
     snprintf(outputPath, sizeof(outputPath), "%s\\%s", outputDirectoryPath, outputName);
     
     // Checking for log flag
+    printf("Beginning Copy...\n");
     if (strcmp(logFlag, "-l") == 0){
         if (copyDir(referenceDirectoryPath, outputPath) != 0){
             printf("Error! Could not copy directory.\n");
@@ -47,6 +48,7 @@ int main(int argc, char *argv[]){
         }
     }
 
+    printf("Copy Complete!\n");
     return 0;
 }
 
