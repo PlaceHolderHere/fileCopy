@@ -5,10 +5,16 @@
 #include <stdint.h>
 #include <errno.h>
 #include <time.h>
+#include <stdbool.h>
 
 int copyFile(char filePath[], char destinationPath[]);
 int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]);
 int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[]);
+
+typedef struct{
+    bool useLogs;
+    bool useCustomName;
+}programFlags;
 
 int main(int argc, char *argv[]){
     if (argc < 3){
@@ -22,23 +28,36 @@ int main(int argc, char *argv[]){
     char *outputDirectoryPath;
     outputDirectoryPath = argv[2];
     char *outputName = "output";
-    // output directory name
+    programFlags programSettings = {false, false};
+    programFlags *pProgramSettings = &programSettings;
+
+    // Optional Inputs
     if (argc > 3){
-        outputName = argv[3];
+        for (int i = 3; i < argc; i++){
+            // Flags
+            if (argv[i][0] == '-'){
+                switch(argv[i][1]){
+                    case 'l': // logs
+                        pProgramSettings->useLogs = true;
+                        break;
+                }
+            }
+            //
+            else if (!programSettings.useCustomName){
+                pProgramSettings->useCustomName = true;
+                outputName = argv[i];
+            }
+        }
     }
-    else{
+
+    // Default Value for outputName
+    if (!programSettings.useCustomName){
         // Getting the current time for the output directory name
         char currentDateBuffer[256];
         time_t currentTimeSeconds = time(NULL);
         struct tm *currentTime = localtime(&currentTimeSeconds);
         sprintf(currentDateBuffer, "%d-%d-%d-%d-%d-%d", currentTime->tm_year + 1900, currentTime->tm_mon+1, currentTime->tm_mday, currentTime->tm_hour, currentTime->tm_min, currentTime->tm_sec);
         outputName = currentDateBuffer;
-    }
-    
-    // logflag
-    char *logFlag;
-    if (argc > 4){
-        logFlag = argv[4];
     }
 
     // Updating the output file path
@@ -47,7 +66,7 @@ int main(int argc, char *argv[]){
     
     // Checking for log flag
     printf("Beginning Copy...\n");
-    if (strcmp(logFlag, "-l") == 0){
+    if (programSettings.useLogs){
         if (copyDir(referenceDirectoryPath, outputPath) != 0){
             printf("Error! Could not copy directory.\n");
             return -1;
