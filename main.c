@@ -66,6 +66,7 @@ int main(int argc, char *argv[]){
     
     // Checking for log flag
     printf("Beginning Copy...\n");
+    int startSeconds = time(NULL);
     if (programSettings.useLogs){
         if (copyDir(referenceDirectoryPath, outputPath) != 0){
             printf("Error! Could not copy directory.\n");
@@ -78,8 +79,8 @@ int main(int argc, char *argv[]){
             return -1;
         }
     }
-
-    printf("Copy Complete!\n");
+    
+    printf("Copy Complete! Operation took %d seconds.\n", time(NULL) - startSeconds);
     return 0;
 }
 
