@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <errno.h>
+#include <time.h>
 
 int copyFile(char filePath[], char destinationPath[]);
 int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]);
@@ -21,9 +22,20 @@ int main(int argc, char *argv[]){
     char *outputDirectoryPath;
     outputDirectoryPath = argv[2];
     char *outputName = "output";
+    // output directory name
     if (argc > 3){
         outputName = argv[3];
     }
+    else{
+        // Getting the current time for the output directory name
+        char currentDateBuffer[256];
+        time_t currentTimeSeconds = time(NULL);
+        struct tm *currentTime = localtime(&currentTimeSeconds);
+        sprintf(currentDateBuffer, "%d-%d-%d-%d-%d-%d", currentTime->tm_year + 1900, currentTime->tm_mon+1, currentTime->tm_mday, currentTime->tm_hour, currentTime->tm_min, currentTime->tm_sec);
+        outputName = currentDateBuffer;
+    }
+    
+    // logflag
     char *logFlag;
     if (argc > 4){
         logFlag = argv[4];
