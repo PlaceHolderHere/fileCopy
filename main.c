@@ -9,7 +9,7 @@
 
 int copyFile(char filePath[], char destinationPath[]);
 int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]);
-int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[]);
+int copyDirLogged(char referenceDirectoryPath[], char destinationDirectoryPath[]);
 
 typedef struct{
     bool useLogs;
@@ -22,15 +22,18 @@ int main(int argc, char *argv[]){
         return -1;
     }
  
-    // Reference Directory
-    char *referenceDirectoryPath;
-    referenceDirectoryPath = argv[1];
-    char *outputDirectoryPath;
-    outputDirectoryPath = argv[2];
-    char *outputName = "output";
+    // Program Variables
+    const int startingFilePathBufferSize = 256;
     programFlags programSettings = {false, false};
     programFlags *pProgramSettings = &programSettings;
-
+    
+    char *referenceDirectoryPath;
+    referenceDirectoryPath = argv[1];
+    
+    char *outputDirectoryPath;
+    outputDirectoryPath = argv[2];
+    
+    char *outputName = "output";    
     // Optional Inputs
     if (argc > 3){
         for (int i = 3; i < argc; i++){
@@ -68,13 +71,13 @@ int main(int argc, char *argv[]){
     printf("Beginning Copy...\n");
     int startSeconds = time(NULL);
     if (programSettings.useLogs){
-        if (copyDir(referenceDirectoryPath, outputPath) != 0){
+        if (copyDirLogged(referenceDirectoryPath, outputPath) != 0){
             printf("Error! Could not copy directory.\n");
             return -1;
         }
     }
     else{
-        if (copyDirLogless(referenceDirectoryPath, outputPath) != 0){
+        if (copyDir(referenceDirectoryPath, outputPath) != 0){
             printf("Error! Could not copy directory.\n");
             return -1;
         }
@@ -85,7 +88,7 @@ int main(int argc, char *argv[]){
 }
 
 
-int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
+int copyDirLogged(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     // Variable Initialization
     int returnValue = 0;
     struct dirent *refDirEntry;
@@ -138,7 +141,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
             // Separating Directories and Files
             if (stat64(currentFilePath, &currentFileInfo) == 0){
                 if (S_ISDIR(currentFileInfo.st_mode)){
-                    if (copyDir(currentFilePath, outputFilePath) != 0){
+                    if (copyDirLogged(currentFilePath, outputFilePath) != 0){
                         returnValue = -1;
                         goto closeRefDir;
                     }
@@ -162,7 +165,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
 }
 
 
-int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[]){
+int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[]){
     // Variable Initialization
     int returnValue = 0;
     struct dirent *refDirEntry;
@@ -214,7 +217,7 @@ int copyDirLogless(char referenceDirectoryPath[], char destinationDirectoryPath[
             // Separating Directories and Files
             if (stat64(currentFilePath, &currentFileInfo) == 0){
                 if (S_ISDIR(currentFileInfo.st_mode)){
-                    if (copyDirLogless(currentFilePath, outputFilePath) != 0){
+                    if (copyDir(currentFilePath, outputFilePath) != 0){
                         returnValue = -1;
                         goto closeRefDir;
                     }
