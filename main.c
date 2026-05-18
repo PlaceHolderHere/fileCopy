@@ -14,10 +14,12 @@ int copyDirLogged(char referenceDirectoryPath[], char destinationDirectoryPath[]
 
 const int CHARSIZE = sizeof(char);
 
-typedef struct{
+struct flags{
     bool useLogs;
     bool useCustomName;
-}programFlags;
+};
+
+struct flags programSettings = {false, false};
 
 int main(int argc, char *argv[]){
     if (argc < 3){
@@ -27,8 +29,6 @@ int main(int argc, char *argv[]){
  
     // Program Variables
     const int initialBufferSize = 2;
-    programFlags programSettings = {false, false};
-    programFlags *pProgramSettings = &programSettings;
     
     char *referenceDirectoryPath;
     referenceDirectoryPath = argv[1];
@@ -44,13 +44,13 @@ int main(int argc, char *argv[]){
             if (argv[i][0] == '-'){
                 switch(argv[i][1]){
                     case 'l': // logs
-                        pProgramSettings->useLogs = true;
+                        programSettings.useLogs = true;
                         break;
                 }
             }
-            //
+            // Custom Output Name
             else if (!programSettings.useCustomName){
-                pProgramSettings->useCustomName = true;
+                programSettings.useCustomName = true;
                 outputName = argv[i];
             }
         }
