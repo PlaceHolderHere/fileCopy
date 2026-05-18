@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
     }
  
     // Program Variables
-    const int initialBufferSize = 2;
+    const int initialBufferSize = 256;
     
     char *referenceDirectoryPath;
     referenceDirectoryPath = argv[1];
