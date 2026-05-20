@@ -16,9 +16,10 @@ const int CHARSIZE = sizeof(char);
 struct flags{
     bool useLogs;
     bool useCustomName;
+    bool forceCopy;
 };
 
-struct flags programSettings = {false, false};
+struct flags programSettings = {false, false, false};
 
 int main(int argc, char *argv[]){
     if (argc < 3){
@@ -44,6 +45,9 @@ int main(int argc, char *argv[]){
                 switch(argv[i][1]){
                     case 'l': // logs
                         programSettings.useLogs = true;
+                        break;
+                    case 'f': // force copy
+                        programSettings.forceCopy = true;
                         break;
                 }
             }
@@ -198,10 +202,21 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
                 }
                 // File Copying
                 else if(S_ISREG(currentFileInfo.st_mode)){ 
+                    // Checking if the output file already exists and force quitting unless forceCopy is enabled
+                    if (!programSettings.forceCopy){
+                        if (stat64(outputFilePathBuffer, &outputFileInfo) == 0){
+                            printf("Error! File already exists at %s, terminating copying.\n", outputFilePathBuffer);
+                            returnValue = -1;
+                            goto closeRefDir;
+                        }
+                    }
+
                     // logs
                     if (programSettings.useLogs){    
                         printf("Copying %s...\n", refDirEntry->d_name);
                     }
+                    
+                    // File Copying
                     if (copyFile(currentFilePathBuffer, outputFilePathBuffer) != 0){
                         printf("Error! Failed to copy %s\n", refDirEntry->d_name);
                         returnValue = -1;
