@@ -17,6 +17,7 @@ struct flags{
     bool useLogs;
     bool useCustomName;
     bool forceCopy;
+    bool copyAll;
 };
 
 struct flags programSettings = {false, false, false};
@@ -48,6 +49,9 @@ int main(int argc, char *argv[]){
                         break;
                     case 'f': // force copy
                         programSettings.forceCopy = true;
+                        break;
+                    case 'a': // copy all
+                        programSettings.copyAll = true;
                         break;
                 }
             }
@@ -202,12 +206,24 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
                 }
                 // File Copying
                 else if(S_ISREG(currentFileInfo.st_mode)){ 
-                    // Checking if the output file already exists and force quitting unless forceCopy is enabled
-                    if (!programSettings.forceCopy){
+                    // forceCopy and copyAll flags
+                    // Checking if the output file already exists
+                    if (!programSettings.forceCopy || !programSettings.copyAll){
                         if (stat64(outputFilePathBuffer, &outputFileInfo) == 0){
-                            printf("Error! File already exists at %s, terminating copying.\n", outputFilePathBuffer);
-                            returnValue = -1;
-                            goto closeRefDir;
+                            
+                            // If copyAll is disabled, check the last modified time of the current and output file
+                            // if the current file is newer than the output file, update the output file
+                            if (!programSettings.copyAll){
+                                if (currentFileInfo.st_mtime < outputFileInfo.st_mtime){
+                                    goto skipCopy;
+                                }
+                            }
+                            // Force quit copying unless forceCopy is enabled
+                            else{
+                                printf("Error! File already exists at %s, terminating copying.\n", outputFilePathBuffer);
+                                returnValue = -1;
+                                goto closeRefDir;
+                            }
                         }
                     }
 
@@ -221,7 +237,8 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
                         printf("Error! Failed to copy %s\n", refDirEntry->d_name);
                         returnValue = -1;
                         goto closeRefDir;
-                    }   
+                    }
+                    skipCopy:   
                 }   
             }
         }
