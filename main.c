@@ -53,12 +53,12 @@ int main(int argc, char *argv[]){
                     case 'a': // copy all
                         programSettings.copyAll = true;
                         break;
+                    case 'n': // custom name
+                        programSettings.useCustomName = true;
+                        outputName = argv[i+1];
+                        i++; // Skipping the next argument since it's the custom name
+                        break;
                 }
-            }
-            // Custom Output Name
-            else if (!programSettings.useCustomName){
-                programSettings.useCustomName = true;
-                outputName = argv[i];
             }
         }
     }
