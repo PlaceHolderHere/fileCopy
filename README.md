@@ -1,1 +1,1 @@
-Hi! This is a project based in C that copies files from 1 directory to another! My main intention for this project is for something to make backups with, similar to robocopy.
+A file copier written in C for making backups/copies, similar to robocopy.
