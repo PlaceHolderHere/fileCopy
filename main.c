@@ -106,14 +106,14 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
     if (currentFilePathBuffer == NULL){
         printf("Error! Failed to allocate currentFilePathBuffer.\n");
         returnValue = -1;
-        goto closeRefDir;
+        goto freeCurrentFilePathBuffer;
     }
 
     char *outputFilePathBuffer = (char*)malloc(CHARSIZE * outputPathBufferSize);
     if (outputFilePathBuffer == NULL){
         printf("Error! Failed to allocate outputFilePathBuffer.\n");
         returnValue = -1;
-        goto closeRefDir;
+        goto freeOutputFilePathBuffer;
     }
 
     DIR *referenceDirectory = opendir(referenceDirectoryPath);
@@ -243,9 +243,16 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
             }
         }
     }
-
+    
     closeRefDir:
     closedir(referenceDirectory);
+    
+    freeOutputFilePathBuffer:
+    free(outputFilePathBuffer);
+
+    freeCurrentFilePathBuffer:
+    free(currentFilePathBuffer);
+
     return returnValue;
 }
 
