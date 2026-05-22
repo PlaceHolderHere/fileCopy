@@ -2,25 +2,31 @@ How to use FileCopy:
 
 When calling FileCopy from your terminal, you need to input at least 2 arguments which are both file paths.
 
-Inputs:
-- The program will not work properly without the following inputs:
-1. Reference File Path - This is the file path that leads to the directory you want to have copied. To get this on windows do the following:
-    1.1. Find and Select the folder you wish to copy in file explorer  
-    1.2. Right Click the Folder
-    1.3. Click on "Copy as Path" which will save it to your clipboard which you can paste with ctrl+v
-2. Output File Path - This is the file path that leads to the folder/drive where you want the copy to be stored. You can follow the same instructions for Reference File Path (1.1-1.3) to get your Output File Path.
+Required Inputs:
+    - The program will not work properly without the following inputs in this order:
+    1. Reference File Path - This is the file path that leads to the directory you want to have copied. To get this input, find the folder you want to copy and follow "How to get a file path" below.
+        
+    2. Output File Path - This is the file path that leads to the folder/drive where you want the copy to be stored. To get this input, find the folder you want to copy and follow "How to get a file path" below.
 
-Optional Inputs:
-- The following inputs are optional and not needed for the program to work:
-3. Output Directory Name - FileCopy defaults to using "output" as the output directory name, but you can input a different name if you wish.
-4. Log flag - adding "-l" as your 4th input causes the program to log every file it copies and every directory it creates.
+Program Flags:
+    - Program Flags are optional inputs that change how fileCopy creates copies
+    3. -l -> Causes the program to log all files and directories created
+    4. -f -> Causes the program to rewrite existing file data in the output directory
+    5. -a -> Causes the program to perform a fileCopy on all files, even if the output file is newer than the reference file.
+    6. -n -> Causes the program to use a custom name for the output directory, specified as the next input after the "-n" flag.
 
 Using FileCopy:
-- The following steps to using FileCopy are:
-1. Download filecopy.exe
-2. Locate where filecopy.exe and Follow steps 1.2 and 1.3 to copy it's file path.
-3. Open Command Prompt or Terminal and input the following command
-4. [Path to filecopy.exe] [Reference File Path] [Output File Path] [Optional: Output Directory Name] [Optional: Log Flag]
-- replace the text within the square brackets based on the needed inputs listed above and don't include the square brackets
-- Optional inputs can be skipped
-5. Hit enter to run the program, it should say when it starts and stops copying.
+    1. Download filecopy.exe and get it's file path (follow "How to get a file path).
+    2. Open Command Prompt or Terminal and input the following command
+    3. [Path to filecopy.exe] [Reference File Path] [Output File Path]
+        - replace the text within the square brackets based on the needed inputs listed above and don't include the square brackets
+    3.1 Optionally, include program flags to alter the program's behavior after the required inputs.
+        - for the "-n" flag, input the following:
+        - -n [custom output name]
+    4. Hit enter to run the program, it should say when it starts and stops copying.
+
+How to get a file path:
+    1. Find and select the folder/file. 
+    2. Right click the folder/file.
+    3. Click on "Copy as Path" which will save the file path to your clipboard.
+    4. Hit ctrl+v on your keyboard to paste the filepath.
