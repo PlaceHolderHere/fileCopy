@@ -11,7 +11,8 @@
 int copyFile(char filePath[], char destinationPath[]);
 int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int currentPathSize, int outputPathSize);
 
-const int CHARSIZE = sizeof(char);
+#define CHARSIZE sizeof(char)
+#define UINT8_SIZE sizeof(uint8_t)
 
 struct flags{
     bool useLogs;
@@ -20,7 +21,7 @@ struct flags{
     bool copyAll;
 };
 
-struct flags programSettings = {false, false, false};
+struct flags programSettings = {false, false, false, false};
 
 int main(int argc, char *argv[]){
     if (argc < 3){
@@ -31,13 +32,15 @@ int main(int argc, char *argv[]){
     // Program Variables
     const int initialBufferSize = 256;
     
+    // Required Inputs
     char *referenceDirectoryPath;
     referenceDirectoryPath = argv[1];
     
     char *outputDirectoryPath;
     outputDirectoryPath = argv[2];
     
-    char *outputName = "output";    
+    char *outputName;
+
     // Optional Inputs
     if (argc > 3){
         for (int i = 3; i < argc; i++){
@@ -64,8 +67,8 @@ int main(int argc, char *argv[]){
     }
 
     // Default Value for outputName
+    // Get the current time and date
     if (!programSettings.useCustomName){
-        // Getting the current time for the output directory name
         char currentDateBuffer[256];
         time_t currentTimeSeconds = time(NULL);
         struct tm *currentTime = localtime(&currentTimeSeconds);
@@ -77,7 +80,7 @@ int main(int argc, char *argv[]){
     char outputPath[1024];
     snprintf(outputPath, sizeof(outputPath), "%s\\%s", outputDirectoryPath, outputName);
     
-    // Checking for log flag
+    // Starting file copying
     printf("Beginning Copy...\n");
     int startSeconds = time(NULL);
     if (copyDir(referenceDirectoryPath, outputPath, initialBufferSize, initialBufferSize) != 0){
@@ -92,16 +95,17 @@ int main(int argc, char *argv[]){
 
 int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int currentPathSize, int outputPathSize){
     // Variable Initialization
-    int returnValue = 0;
+    const int refDirPathSize = strlen(referenceDirectoryPath);
+    const int outDirPathSize = strlen(destinationDirectoryPath);
     struct dirent *refDirEntry;
     struct stat64 currentFileInfo;
     struct stat64 outputFileInfo;
-    const int refDirPathSize = strlen(referenceDirectoryPath);
-    const int outDirPathSize = strlen(destinationDirectoryPath);
     int currentPathBufferSize = currentPathSize;
     int outputPathBufferSize = outputPathSize;
     int dirEntryPathSize = -1;
+    int returnValue = 0;
 
+    // Allocating currentFilePathBuffer
     char *currentFilePathBuffer = (char*)malloc(CHARSIZE * currentPathBufferSize);
     if (currentFilePathBuffer == NULL){
         printf("Error! Failed to allocate currentFilePathBuffer.\n");
@@ -109,6 +113,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
         goto freeCurrentFilePathBuffer;
     }
 
+    // Allocating outputFilePathBuffer
     char *outputFilePathBuffer = (char*)malloc(CHARSIZE * outputPathBufferSize);
     if (outputFilePathBuffer == NULL){
         printf("Error! Failed to allocate outputFilePathBuffer.\n");
@@ -116,6 +121,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
         goto freeOutputFilePathBuffer;
     }
 
+    // Opening the referenceDirectory
     DIR *referenceDirectory = opendir(referenceDirectoryPath);
     if (referenceDirectory == NULL){
         printf("Error Number: %d\n Error Message:%s\n\nError! Failed to open referenceDirectory.\n", errno, strerror(errno));
@@ -125,17 +131,22 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
 
     // Checking if output directory exists
     if (stat64(destinationDirectoryPath, &outputFileInfo) != 0){
+        
+        // Creating an output directory if it doesn't exist
         if (errno == ENOENT){
+            
             // Logs
             if (programSettings.useLogs){
                 printf("Creating a folder at %s\n", destinationDirectoryPath);
             }
+            
             if (mkdir(destinationDirectoryPath) != 0){
                 printf("Error Number: %d\n Error Message:%s\n\nError! Failed to copy directory.\n", errno, strerror(errno));
                 returnValue = -1;
                 goto closeRefDir;
             }
         }
+
         else{
             printf("Error Number: %d\n Error Message:%s\n\nError! Could not Access the output directory.\n", errno, strerror(errno));
             returnValue = -1;
@@ -145,20 +156,25 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
 
     // Reading the Reference Directory
     while ((refDirEntry = readdir(referenceDirectory)) != NULL){
-        if (strcmp(refDirEntry->d_name, "..") != 0 && strcmp(refDirEntry->d_name, ".")){ // Filtering Out Parent & Current Working Directory
+        
+        // Filtering Out Parent & Current Working Directory
+        if (strcmp(refDirEntry->d_name, "..") != 0 && strcmp(refDirEntry->d_name, ".")){
             dirEntryPathSize = strlen(refDirEntry->d_name);
 
             // Checking if the currentFilePath will fit in the buffer and reallocaating memory if it doesn't
-            // 12 is from a string "%s\\%s" and some extra as a buffer
+            // 12 bytes is from "%s\\%s" and some extra as a buffer
             if (refDirPathSize + 12 + dirEntryPathSize > currentPathBufferSize){
                 currentPathBufferSize += ((refDirPathSize + 12 + dirEntryPathSize) - currentPathBufferSize);
                 currentPathBufferSize *= 2;
+
+                // Reallocating currentFilePathBuffer
                 char* inTempPointer = (char*)realloc(currentFilePathBuffer, CHARSIZE * currentPathBufferSize);
                 if (inTempPointer == NULL){
                     printf("Error! Failed to reallocate memory for currentPathBuffer\n");
                     returnValue = -1;
                     goto closeRefDir;
                 }
+                
                 else{
                     currentFilePathBuffer = inTempPointer;
                     inTempPointer = NULL;
@@ -166,16 +182,19 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
             }
 
             // Checking if the outputFilePath will fit in the buffer and reallocating memory if it doesn't
-            // 12 is from a string "%s\\%s" and some extra as a buffer
+            // 12 bytes is from "%s\\%s" and some extra as a buffer
             if (outDirPathSize + 12 + dirEntryPathSize > outputPathBufferSize){
                 outputPathBufferSize += ((outDirPathSize + 12 + dirEntryPathSize) - outputPathBufferSize);
                 outputPathBufferSize *= 2; 
+                
+                // Reallocating outputFilePathBuffer
                 char* outTempPointer = (char*)realloc(outputFilePathBuffer, CHARSIZE * outputPathBufferSize);
                 if (outTempPointer == NULL){
                     printf("Error! Failed to reallocate memory for outputPathBuffer\n");
                     returnValue = -1;
                     goto closeRefDir;
                 }
+                
                 else{
                     outputFilePathBuffer = outTempPointer;
                     outTempPointer = NULL;
@@ -198,14 +217,18 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
             
             // Separating Directories and Files
             if (stat64(currentFilePathBuffer, &currentFileInfo) == 0){
+                
+                // Directories
                 if (S_ISDIR(currentFileInfo.st_mode)){
                     if (copyDir(currentFilePathBuffer, outputFilePathBuffer, currentPathBufferSize, outputPathBufferSize) != 0){
                         returnValue = -1;
                         goto closeRefDir;
                     }
                 }
+
                 // File Copying
                 else if(S_ISREG(currentFileInfo.st_mode)){ 
+
                     // forceCopy and copyAll flags
                     // Checking if the output file already exists
                     if (!programSettings.forceCopy || !programSettings.copyAll){
@@ -218,6 +241,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
                                     goto skipCopy;
                                 }
                             }
+
                             // Force quit copying unless forceCopy is enabled
                             else{
                                 printf("Error! File already exists at %s, terminating copying.\n", outputFilePathBuffer);
@@ -244,6 +268,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
         }
     }
     
+    // Exit Handling
     closeRefDir:
     closedir(referenceDirectory);
     
@@ -258,22 +283,22 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
 
 
 int copyFile(char filePath[], char destinationPath[]){
-    int returnValue = 0;
-    FILE *referenceFile = fopen(filePath, "rb");
-    FILE *outputFile = fopen(destinationPath, "wb");
-    int buffer_size = 1000000;
+    // Variable Initialization
+    const int buffer_size = 1000000;
     uint8_t buffer[buffer_size];
-    const int uint8_size = sizeof(uint8_t);
+    int returnValue = 0;
     int num_of_bytes_read = 0;
     
-    // referenceFile Error Handling
+    // Opening Reference File
+    FILE *referenceFile = fopen(filePath, "rb");
     if (referenceFile == NULL){
         printf("Error Number: %d\n Error Message:%s\n\nError! Failed to open referenceFile\n", errno, strerror(errno));
         returnValue = -1;
         goto closeRefFile;
     }
 
-    // outputFile Error Handling
+    // Opening Output File
+    FILE *outputFile = fopen(destinationPath, "wb");
     if (outputFile == NULL){
         printf("Error Number: %d\n Error Message:%s\n\nError! Failed to open outputFile\n", errno, strerror(errno));
         returnValue = -1;
@@ -281,8 +306,8 @@ int copyFile(char filePath[], char destinationPath[]){
     }
     
     // Copying Files
-    while ((num_of_bytes_read = fread(&buffer, uint8_size, buffer_size, referenceFile)) > 0){
-        if(fwrite(&buffer, uint8_size, num_of_bytes_read, outputFile) != num_of_bytes_read){
+    while ((num_of_bytes_read = fread(&buffer, UINT8_SIZE, buffer_size, referenceFile)) > 0){
+        if(fwrite(&buffer, UINT8_SIZE, num_of_bytes_read, outputFile) != num_of_bytes_read){
             printf("Error Number: %d\n Error Message:%s\n\nError! Failed to complete file copying\n", errno, strerror(errno));
             returnValue = -1;
             goto closeAllFiles;
