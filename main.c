@@ -14,6 +14,8 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
 #define CHARSIZE sizeof(char)
 #define UINT8_SIZE sizeof(uint8_t)
 
+int numOfFilesCopied = 0;
+
 struct flags{
     bool useLogs;
     bool useCustomName;
@@ -89,6 +91,7 @@ int main(int argc, char *argv[]){
     }
     
     printf("Copy Complete! Operation took %d seconds.\n", time(NULL) - startSeconds);
+    printf("Number of files copied: %d\n", numOfFilesCopied);
     return 0;
 }
 
@@ -257,6 +260,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
                     }
                     
                     // File Copying
+                    numOfFilesCopied++;
                     if (copyFile(currentFilePathBuffer, outputFilePathBuffer) != 0){
                         printf("Error! Failed to copy %s\n", refDirEntry->d_name);
                         returnValue = -1;
