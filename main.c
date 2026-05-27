@@ -11,8 +11,10 @@
 int copyFile(char filePath[], char destinationPath[]);
 int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int currentPathSize, int outputPathSize);
 
-#define CHARSIZE sizeof(char)
-#define UINT8_SIZE sizeof(uint8_t)
+// Global Constants
+const int CHARSIZE = sizeof(char);
+const int UINT8_SIZE = sizeof(uint8_t);
+const int initialBufferSize = 256;
 
 int numOfFilesCopied = 0;
 
@@ -30,9 +32,6 @@ int main(int argc, char *argv[]){
         printf("Error! Incomplete inputs, please provide a reference directory and an output directory.\n");
         return -1;
     }
- 
-    // Program Variables
-    const int initialBufferSize = 256;
     
     // Required Inputs
     char *referenceDirectoryPath;
@@ -43,27 +42,24 @@ int main(int argc, char *argv[]){
     
     char *outputName;
 
-    // Optional Inputs
-    if (argc > 3){
-        for (int i = 3; i < argc; i++){
-            // Flags
-            if (argv[i][0] == '-'){
-                switch(argv[i][1]){
-                    case 'l': // logs
-                        programSettings.useLogs = true;
-                        break;
-                    case 'f': // force copy
-                        programSettings.forceCopy = true;
-                        break;
-                    case 'a': // copy all
-                        programSettings.copyAll = true;
-                        break;
-                    case 'n': // custom name
-                        programSettings.useCustomName = true;
-                        outputName = argv[i+1];
-                        i++; // Skipping the next argument since it's the custom name
-                        break;
-                }
+    // Optional Inputs/Flags
+    for (int i = 3; i < argc; i++){
+        if (argv[i][0] == '-'){
+            switch(argv[i][1]){
+                case 'l': // logs
+                    programSettings.useLogs = true;
+                    break;
+                case 'f': // force copy
+                    programSettings.forceCopy = true;
+                    break;
+                case 'a': // copy all
+                    programSettings.copyAll = true;
+                    break;
+                case 'n': // custom name
+                    programSettings.useCustomName = true;
+                    outputName = argv[i+1];
+                    i++; // Skipping the next argument since it's the custom name
+                    break;
             }
         }
     }
