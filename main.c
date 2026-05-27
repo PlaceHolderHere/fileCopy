@@ -74,9 +74,14 @@ int main(int argc, char *argv[]){
         outputName = currentDateBuffer;
     }
 
-    // Updating the output file path
-    char outputPath[1024];
-    snprintf(outputPath, sizeof(outputPath), "%s\\%s", outputDirectoryPath, outputName);
+    // Allocating a buffer for the output path and merging it with the outputName
+    int outputPathSize = strlen(outputDirectoryPath) + strlen(outputName) + 12; // 12 bytes is from "%s\\%s" and some extra as a buffer 
+    char *outputPath = (char*)malloc(CHARSIZE * outputPathSize);
+    if (outputPath == NULL){
+        printf("Error! Failed to allocate outputPath\n");
+        return -1;
+    }
+    snprintf(outputPath, outputPathSize, "%s\\%s", outputDirectoryPath, outputName);
     
     // Starting file copying
     printf("Beginning Copy...\n");
@@ -85,9 +90,13 @@ int main(int argc, char *argv[]){
         printf("Error! Could not copy directory.\n");
         return -1;
     }
-    
+
     printf("Copy Complete! Operation took %d seconds.\n", time(NULL) - startSeconds);
     printf("Number of files copied: %d\n", numOfFilesCopied);
+
+    // Freeing outputPath buffer
+    free(outputPath);
+
     return 0;
 }
 
