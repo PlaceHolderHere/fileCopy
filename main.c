@@ -85,6 +85,13 @@ int main(int argc, char *argv[]){
     }
     snprintf(outputPath, outputPathSize, "%s\\%s", outputDirectoryPath, outputName);
     
+    // Checking if the reference and output directory aren't the same
+    if (strcmp(referenceDirectoryPath, outputPath) == 0){
+        printf("Error! Reference and output directory cannot be the same.\n");
+        returnValue = -1;
+        goto freeOutputPath;
+    }
+
     // Starting file copying
     printf("Beginning Copy...\n");
     int startSeconds = time(NULL);
