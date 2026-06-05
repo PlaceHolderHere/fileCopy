@@ -28,6 +28,7 @@ struct flags{
 struct flags programSettings = {false, false, false, false};
 
 int main(int argc, char *argv[]){
+    int returnValue = 0;
     if (argc < 3){
         printf("Error! Incomplete inputs, please provide a reference directory and an output directory.\n");
         return -1;
@@ -79,7 +80,8 @@ int main(int argc, char *argv[]){
     char *outputPath = (char*)malloc(CHARSIZE * outputPathSize);
     if (outputPath == NULL){
         printf("Error! Failed to allocate outputPath\n");
-        return -1;
+        returnValue = -1;
+        goto freeOutputPath;
     }
     snprintf(outputPath, outputPathSize, "%s\\%s", outputDirectoryPath, outputName);
     
@@ -88,13 +90,15 @@ int main(int argc, char *argv[]){
     int startSeconds = time(NULL);
     if (copyDir(referenceDirectoryPath, outputPath, initialBufferSize, initialBufferSize) != 0){
         printf("Error! Could not copy directory.\n");
-        return -1;
+        returnValue = -1;
+        goto freeOutputPath;
     }
 
     printf("Copy Complete! Operation took %d seconds.\n", time(NULL) - startSeconds);
     printf("Number of files copied: %d\n", numOfFilesCopied);
 
     // Freeing outputPath buffer
+    freeOutputPath:
     free(outputPath);
 
     return 0;
