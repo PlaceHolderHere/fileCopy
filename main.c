@@ -1,3 +1,5 @@
+#define _FILE_OFFSET_BITS 64
+
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -117,8 +119,8 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
     const int refDirPathSize = strlen(referenceDirectoryPath);
     const int outDirPathSize = strlen(destinationDirectoryPath);
     struct dirent *refDirEntry;
-    struct stat64 currentFileInfo;
-    struct stat64 outputFileInfo;
+    struct stat currentFileInfo;
+    struct stat outputFileInfo;
     int currentPathBufferSize = currentPathSize;
     int outputPathBufferSize = outputPathSize;
     int dirEntryPathSize = -1;
@@ -149,7 +151,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
     }
 
     // Checking if output directory exists
-    if (stat64(destinationDirectoryPath, &outputFileInfo) != 0){
+    if (stat(destinationDirectoryPath, &outputFileInfo) != 0){
         
         // Creating an output directory if it doesn't exist
         if (errno == ENOENT){
@@ -235,7 +237,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
             }
             
             // Separating Directories and Files
-            if (stat64(currentFilePathBuffer, &currentFileInfo) == 0){
+            if (stat(currentFilePathBuffer, &currentFileInfo) == 0){
                 
                 // Directories
                 if (S_ISDIR(currentFileInfo.st_mode)){
@@ -251,7 +253,7 @@ int copyDir(char referenceDirectoryPath[], char destinationDirectoryPath[], int 
                     // forceCopy and copyAll flags
                     // Checking if the output file already exists
                     if (!programSettings.forceCopy || !programSettings.copyAll){
-                        if (stat64(outputFilePathBuffer, &outputFileInfo) == 0){
+                        if (stat(outputFilePathBuffer, &outputFileInfo) == 0){
                             
                             // If copyAll is disabled, check the last modified time of the current and output file
                             // if the current file is newer than the output file, update the output file
